@@ -24,8 +24,9 @@ class RecintosZoo {
         this.recintos = RECINTOS;
     }
 
-    // Método que retorna o recinto com o maior número de animais
+    // Verifica os recintos que podem receber o animal
     analisaRecintos(especie, quantidade) {
+
         // Validar se o animal é válido
         if (!this.animais[especie]) {
             return { erro: "Animal inválido" };
@@ -48,36 +49,45 @@ class RecintosZoo {
     }
 
     // Método que retorna os recintos viáveis para o animal
-    // Verifica os recintos que podem receber o animal
     recintosViaveis(especie, quantidade) {
         const { tamanho, biomas } = this.animais[especie];
         const recintosDisponiveis = [];
 
         // Verifica cada recinto disponível para o animal
         this.recintos.forEach((recinto) => {
+
             // Verifica se pelo menos um bioma do recinto é adequado
             const biomasRecinto = recinto.bioma.split(' e ');
+            /*
+            * .split(): Usado para dividir uma string em um array de substrings
+            * com base em um separador fornecido como argumento.
+            */
+
+            // Verifica se pelo menos um bioma do recinto é adequado
             const biomaAdequado = biomas.some(bioma => biomasRecinto.includes(bioma));
+
+            /*
+             * .some(): Método usado em arrays que testa se ao menos um dos elementos no array passa no teste implementado pela função fornecida. 
+             * Retorna true se encontrar um elemento que satisfaça a condição, caso contrário, retorna false.
+            */
+
             if (!biomaAdequado) return;
 
 
             // Verifica as regras específicas de convivência
             if (this.validarConvivencia(especie, quantidade, recinto)) {
+
+                // Calcula o espaço ocupado no recinto com base nos animais existentes
                 let espacoOcupado = recinto.animaisExistentes.reduce((total, animal) => {
                     const { especie, quantidade } = animal;
                     return total + (this.animais[especie].tamanho * quantidade);
                 }, 0);
-                // Espaço extra se houver mais de uma espécie no recinto
 
                 // Verifica se há mais de uma espécie no recinto, ignorando espécies repetidas pelo new Set
                 let especiesExistentes = new Set(recinto.animaisExistentes.map(animal => animal.especie));
-
-                // Verifica se há mais de uma espécie no recinto
                 if (especiesExistentes.size >= 1 && !especiesExistentes.has(especie)) {
                     espacoOcupado += 1;
                 }
-
-
                 let espacoRestante = recinto.tamanhoTotal - espacoOcupado;
 
                 // Verifica se há espaço suficiente para o novo animal
@@ -88,7 +98,7 @@ class RecintosZoo {
             }
         });
 
-        // Ordena os recintos disponíveis por número
+        // Ordena os recintos disponíveis por número usando o método sort
         return recintosDisponiveis.sort((a, b) => {
             const numeroA = parseInt(a.match(/\d+/)[0], 10);
             const numeroB = parseInt(b.match(/\d+/)[0], 10);
